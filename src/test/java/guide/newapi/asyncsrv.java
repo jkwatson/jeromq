@@ -34,7 +34,7 @@ public class asyncsrv {
             client.connect("tcp://localhost:5570");
 
             Poller poller = context.createPoller();
-            poller.register(client);
+            poller.register(client, PollOption.POLL_IN);
 
             int request_nbr = 0;
             while (true) {
@@ -74,13 +74,12 @@ public class asyncsrv {
             backend.bind("inproc://backend");
 
             //  Launch pool of worker threads, precise number is not critical
-            for (int threadNumber = 0; threadNumber < 150; threadNumber++) {
+            for (int threadNumber = 0; threadNumber < 5; threadNumber++) {
                 new Thread(new ServerWorker(context), "serverWorker-" + threadNumber).start();
             }
 
             //  Connect backend to frontend via a proxy
-            boolean result = context.startProxy(frontend, backend);
-            System.out.println("result = " + result);
+            context.startProxy(frontend, backend);
 //            context.terminate();
         }
     }
